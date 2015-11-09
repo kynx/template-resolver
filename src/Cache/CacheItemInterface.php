@@ -41,5 +41,4 @@ interface CacheItemInterface
      *   True if the request resulted in a cache hit. False otherwise.
      */
     public function isHit();
-
 }

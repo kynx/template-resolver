@@ -9,4 +9,5 @@ namespace Kynx\Template\Resolver\Exception;
 use InvalidArgumentException;
 
 class InvalidNamespaceException extends InvalidArgumentException implements ExceptionInterface
-{}
+{
+}

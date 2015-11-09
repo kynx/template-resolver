@@ -6,6 +6,6 @@
 
 namespace Kynx\Template\Resolver\Exception;
 
-
 interface ExceptionInterface
-{}
+{
+}

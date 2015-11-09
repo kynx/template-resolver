@@ -6,8 +6,6 @@
 
 namespace Kynx\Template\Resolver;
 
-use SplStack;
-
 abstract class AbstractResolver implements ResolverInterface
 {
     const DEFAULT_NAMESPACE = '__DEFAULT__';
@@ -52,37 +50,6 @@ abstract class AbstractResolver implements ResolverInterface
     {
         $this->isCompiled = $isCompiled;
         return $this;
-    }
-
-    /**
-     * Add a (optionally namespaced) template path to the resolver
-     * @param string $path
-     * @param string|null $namespace
-     * @return $this
-     */
-    public function addTemplatePath($path, $namespace = null)
-    {
-        if (null !== $namespace && ! is_string($namespace)) {
-            throw new Exception\InvalidNamespaceException('Namespace must be a string');
-        }
-
-        $namespace = $namespace ?: self::DEFAULT_NAMESPACE;
-        $path = rtrim((string) $path, '/\\');
-        $this->getTemplatePath($namespace)->push($path);
-
-        return $this;
-    }
-
-    /**
-     * @param $namespace
-     * @return SplStack
-     */
-    protected function getTemplatePath($namespace)
-    {
-        if (!isset($this->paths[$namespace])) {
-            $this->paths[$namespace] = new SplStack();
-        }
-        return $this->paths[$namespace];
     }
 
     protected function parseTemplateNamespace($template)

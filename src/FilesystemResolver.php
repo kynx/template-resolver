@@ -6,7 +6,9 @@
 
 namespace Kynx\Template\Resolver;
 
-final class FilesystemResolver extends AbstractResolver
+use SplStack;
+
+final class FilesystemResolver extends AbstractResolver implements PathedResolverInterface
 {
     /**
      * @param $template
@@ -41,7 +43,27 @@ final class FilesystemResolver extends AbstractResolver
             throw new Exception\InvalidPathException("Template path '$path' does not exist");
         }
 
-        return parent::addTemplatePath($path, $namespace);
+        if (null !== $namespace && ! is_string($namespace)) {
+            throw new Exception\InvalidNamespaceException('Namespace must be a string');
+        }
+
+        $namespace = $namespace ?: self::DEFAULT_NAMESPACE;
+        $path = rtrim((string) $path, '/\\');
+        $this->getTemplatePath($namespace)->push($path);
+
+        return $this;
+    }
+
+    /**
+     * @param $namespace
+     * @return SplStack
+     */
+    private function getTemplatePath($namespace)
+    {
+        if (!isset($this->paths[$namespace])) {
+            $this->paths[$namespace] = new SplStack();
+        }
+        return $this->paths[$namespace];
     }
 
     /**
@@ -60,7 +82,8 @@ final class FilesystemResolver extends AbstractResolver
             $filename = $path . $template;
             $contents = @file_get_contents($filename);
             if ($contents !== false) {
-                return new Result($filename, $contents, $this->isCompiled());
+                $key = $namespace . '::' . $template;
+                return new Result($key, $contents, $this->isCompiled());
             }
         }
         return null;

@@ -9,8 +9,7 @@ namespace KynxTest\Template\Resolver;
 use Kynx\Template\Resolver\AbstractResolver;
 use Kynx\Template\Resolver\CacheResolver;
 use Kynx\Template\Resolver\Cache\CacheItemPoolInterface;
-use Kynx\Template\Resolver\Cache\CacheItemInterface;;
-
+use Kynx\Template\Resolver\Cache\CacheItemInterface;
 use PHPUnit_Framework_TestCase as TestCase;
 use Prophecy\Argument;
 
@@ -29,72 +28,69 @@ final class CacheResolverTest extends TestCase
 
     public function testDefaultNamespaceMissingIsNull()
     {
-        $resolver = $this->getResolver('', '', false);
+        $cacheKey = AbstractResolver::DEFAULT_NAMESPACE . '::missing';
+        $resolver = $this->getResolver($cacheKey, '', false);
         $result = $resolver->resolve('missing');
         $this->assertNull($result);
     }
 
-    /**
-     * @expectedException \Kynx\Template\Resolver\Exception\InvalidPathException
-     */
-    public function testAddInvalidPath()
-    {
-        $this->resolver->addTemplatePath(__DIR__ . '/templates1');
-    }
-
     public function testDefaultNamespaceWithPath()
     {
-        $this->resolver->addTemplatePath(__DIR__ . '/templates');
-        $result = $this->resolver->resolve('test1/test');
-        $this->assertEquals("test1 template\n", (string) $result);
+        $cacheKey = AbstractResolver::DEFAULT_NAMESPACE . '::test1/test';
+        $template = "test1 template";
+        $resolver = $this->getResolver($cacheKey, $template);
+        $result = $resolver->resolve('test1/test');
+        $this->assertEquals("test1 template", (string) $result);
+        $this->assertEquals($cacheKey, $result->getKey());
     }
 
     public function testDefaultNamespaceWithAlternateSeparator()
     {
-        $this->resolver->addTemplatePath(__DIR__ . '/templates')
-            ->setSeparator('.');
-        $result = $this->resolver->resolve('test1.test');
-        $this->assertEquals("test1 template\n", (string) $result);
+        $cacheKey = AbstractResolver::DEFAULT_NAMESPACE . '::test1.test';
+        $template = "test1 template";
+        $resolver = $this->getResolver($cacheKey, $template);
+        $resolver->setSeparator('.');
+        $result = $resolver->resolve('test1.test');
+        $this->assertEquals("test1 template", (string) $result);
+        $this->assertEquals($cacheKey, $result->getKey());
     }
 
     public function testNamespacedTemplate()
     {
-        $this->resolver->addTemplatePath(__DIR__ . '/templates')
-            ->addTemplatePath(__DIR__ . '/templates/test1', 'test');
-        $result = $this->resolver->resolve('test::test');
-        $this->assertEquals("test1 template\n", (string) $result);
-        $this->assertEquals(__DIR__ . '/templates/test1/test.template', $result->getKey());
+        $cacheKey = 'test::test';
+        $template = "test1 template";
+        $resolver = $this->getResolver($cacheKey, $template);
+        $result = $resolver->resolve('test::test');
+        $this->assertEquals("test1 template", (string) $result);
+        $this->assertEquals($cacheKey, $result->getKey());
     }
 
     public function testNamespacedDefaultResolved()
     {
-        $this->resolver->addTemplatePath(__DIR__ . '/templates')
-            ->addTemplatePath(__DIR__ . '/templates/test1', 'test');
-        $result = $this->resolver->resolve('test');
+        $cacheProphesy = $this->prophesize(CacheItemPoolInterface::class);
+        $itemProphesy = $this->prophesize(CacheItemInterface::class);
+        $cacheProphesy->getItem(Argument::type('string'))
+            ->will(function ($args) use ($itemProphesy) {
+                $isHit = $args[0] == AbstractResolver::DEFAULT_NAMESPACE . '::test';
+                $itemProphesy->isHit()
+                    ->willReturn($isHit);
+                $itemProphesy->get()
+                    ->willReturn($isHit ? "test\n" : null);
+                return $itemProphesy->reveal();
+            });
+        $resolver = new CacheResolver($cacheProphesy->reveal());
+        $result = $resolver->resolve('test::test');
+        $this->assertNotNull($result);
         $this->assertEquals("test\n", (string) $result);
-    }
-
-    public function testDefaultsToDefaultNamespace()
-    {
-        $this->resolver->addTemplatePath(__DIR__ . '/templates')
-            ->addTemplatePath(__DIR__ . '/templates/test1', 'test');
-        $result = $this->resolver->resolve('test::test2');
-        $this->assertEquals("test2\n", (string) $result);
-    }
-
-    /**
-     * @expectedException \Kynx\Template\Resolver\Exception\InvalidNamespaceException
-     */
-    public function testAddInvalidNamespace()
-    {
-        $this->resolver->addTemplatePath(__DIR__ . '/templates/test1', []);
     }
 
     public function testIsCompiled()
     {
-        $this->resolver->addTemplatePath(__DIR__ . '/templates')
-            ->setIsCompiled(true);
-        $result = $this->resolver->resolve('test');
+        $cacheKey = AbstractResolver::DEFAULT_NAMESPACE . '::test';
+        $template = "test";
+        $resolver = $this->getResolver($cacheKey, $template);
+        $resolver->setIsCompiled(true);
+        $result = $resolver->resolve('test');
         $this->assertTrue($result->isCompiled());
     }
 

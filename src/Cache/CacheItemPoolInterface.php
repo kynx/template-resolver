@@ -34,5 +34,4 @@ interface CacheItemPoolInterface
      *   The corresponding Cache Item.
      */
     public function getItem($key);
-
 }
