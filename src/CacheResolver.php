@@ -54,7 +54,7 @@ final class CacheResolver extends AbstractResolver
         $key = $namespace . '::' . $template;
         $cacheItem = $this->cacheItemPool->getItem($key);
         if ($cacheItem->isHit()) {
-            return new Result($key, $cacheItem->get(), $this->isCompiled());
+            return new Result($key, $cacheItem->get(), true, $this->isCompiled());
         }
         return null;
     }

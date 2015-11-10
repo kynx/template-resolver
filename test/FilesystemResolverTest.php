@@ -25,7 +25,7 @@ final class FilesystemResolverTest extends TestCase
 
     public function testDefaultNamespaceTemplateResolves()
     {
-        $this->resolver->addTemplatePath(__DIR__ . '/templates');
+        $this->resolver->addPath(__DIR__ . '/templates');
         $result = $this->resolver->resolve('test');
         $this->assertEquals("test\n", (string) $result);
         $this->assertEquals(__DIR__ . '/templates/test.template', $result->getKey());
@@ -34,7 +34,7 @@ final class FilesystemResolverTest extends TestCase
 
     public function testDefaultNamespaceMissingIsNull()
     {
-        $this->resolver->addTemplatePath(__DIR__ . '/templates');
+        $this->resolver->addPath(__DIR__ . '/templates');
         $result = $this->resolver->resolve('missing');
         $this->assertNull($result);
     }
@@ -42,7 +42,7 @@ final class FilesystemResolverTest extends TestCase
     public function testDefaultNamespaceWrongExtension()
     {
 
-        $this->resolver->addTemplatePath(__DIR__ . '/templates')
+        $this->resolver->addPath(__DIR__ . '/templates')
             ->setExtension('template2');
         $result = $this->resolver->resolve('test');
         $this->assertNull($result);
@@ -53,19 +53,19 @@ final class FilesystemResolverTest extends TestCase
      */
     public function testAddInvalidPath()
     {
-        $this->resolver->addTemplatePath(__DIR__ . '/templates1');
+        $this->resolver->addPath(__DIR__ . '/templates1');
     }
 
     public function testDefaultNamespaceWithPath()
     {
-        $this->resolver->addTemplatePath(__DIR__ . '/templates');
+        $this->resolver->addPath(__DIR__ . '/templates');
         $result = $this->resolver->resolve('test1/test');
         $this->assertEquals("test1 template\n", (string) $result);
     }
 
     public function testDefaultNamespaceWithAlternateSeparator()
     {
-        $this->resolver->addTemplatePath(__DIR__ . '/templates')
+        $this->resolver->addPath(__DIR__ . '/templates')
             ->setSeparator('.');
         $result = $this->resolver->resolve('test1.test');
         $this->assertEquals("test1 template\n", (string) $result);
@@ -73,8 +73,8 @@ final class FilesystemResolverTest extends TestCase
 
     public function testNamespacedTemplate()
     {
-        $this->resolver->addTemplatePath(__DIR__ . '/templates')
-            ->addTemplatePath(__DIR__ . '/templates/test1', 'test');
+        $this->resolver->addPath(__DIR__ . '/templates')
+            ->addPath(__DIR__ . '/templates/test1', 'test');
         $result = $this->resolver->resolve('test::test');
         $this->assertEquals("test1 template\n", (string) $result);
         $this->assertEquals(__DIR__ . '/templates/test1/test.template', $result->getKey());
@@ -82,16 +82,16 @@ final class FilesystemResolverTest extends TestCase
 
     public function testNamespacedDefaultResolved()
     {
-        $this->resolver->addTemplatePath(__DIR__ . '/templates')
-            ->addTemplatePath(__DIR__ . '/templates/test1', 'test');
+        $this->resolver->addPath(__DIR__ . '/templates')
+            ->addPath(__DIR__ . '/templates/test1', 'test');
         $result = $this->resolver->resolve('test');
         $this->assertEquals("test\n", (string) $result);
     }
 
     public function testDefaultsToDefaultNamespace()
     {
-        $this->resolver->addTemplatePath(__DIR__ . '/templates')
-            ->addTemplatePath(__DIR__ . '/templates/test1', 'test');
+        $this->resolver->addPath(__DIR__ . '/templates')
+            ->addPath(__DIR__ . '/templates/test1', 'test');
         $result = $this->resolver->resolve('test::test2');
         $this->assertEquals("test2\n", (string) $result);
     }
@@ -101,12 +101,12 @@ final class FilesystemResolverTest extends TestCase
      */
     public function testAddInvalidNamespace()
     {
-        $this->resolver->addTemplatePath(__DIR__ . '/templates/test1', []);
+        $this->resolver->addPath(__DIR__ . '/templates/test1', []);
     }
 
     public function testIsCompiled()
     {
-        $this->resolver->addTemplatePath(__DIR__ . '/templates')
+        $this->resolver->addPath(__DIR__ . '/templates')
             ->setIsCompiled(true);
         $result = $this->resolver->resolve('test');
         $this->assertTrue($result->isCompiled());

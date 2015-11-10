@@ -22,6 +22,10 @@ final class Result
     /**
      * @var bool
      */
+    private $isCached;
+    /**
+     * @var bool
+     */
     private $isCompiled;
 
     /**
@@ -31,10 +35,11 @@ final class Result
      * @param string $contents
      * @param bool $isCompiled
      */
-    public function __construct($key, $contents, $isCompiled)
+    public function __construct($key, $contents, $isCached, $isCompiled)
     {
         $this->key = $key;
         $this->contents = $contents;
+        $this->isCached = $isCached;
         $this->isCompiled = $isCompiled;
     }
 
@@ -63,6 +68,15 @@ final class Result
     public function getKey()
     {
         return $this->key;
+    }
+
+    /**
+     * Returns true if contents come from cache
+     * @return string
+     */
+    public function isCached()
+    {
+        return $this->isCached;
     }
 
     /**

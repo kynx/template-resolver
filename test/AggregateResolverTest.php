@@ -75,7 +75,7 @@ final class AggregateResolverTest extends TestCase
     {
         $cache = $this->getCacheResolver(AbstractResolver::DEFAULT_NAMESPACE . '::missing', '', false);
         $filesystem = $this->getFilesystemResolver();
-        $filesystem->addTemplatePath(__DIR__ . '/templates');
+        $filesystem->addPath(__DIR__ . '/templates');
         $this->resolver->attach($filesystem, 0);
         $this->resolver->attach($cache);
         $result = $this->resolver->resolve('missing');
@@ -86,7 +86,7 @@ final class AggregateResolverTest extends TestCase
     {
         $cache = $this->getCacheResolver(AbstractResolver::DEFAULT_NAMESPACE . '::test', 'cached');
         $filesystem = $this->getFilesystemResolver();
-        $filesystem->addTemplatePath(__DIR__ . '/templates');
+        $filesystem->addPath(__DIR__ . '/templates');
         $this->resolver->attach($filesystem, 0);
         $this->resolver->attach($cache);
         $result = $this->resolver->resolve('test');
@@ -97,7 +97,7 @@ final class AggregateResolverTest extends TestCase
     {
         $cache = $this->getCacheResolver(AbstractResolver::DEFAULT_NAMESPACE . '::test', '', false);
         $filesystem = $this->getFilesystemResolver();
-        $filesystem->addTemplatePath(__DIR__ . '/templates');
+        $filesystem->addPath(__DIR__ . '/templates');
         $this->resolver->attach($filesystem, 0);
         $this->resolver->attach($cache);
         $result = $this->resolver->resolve('test');

@@ -37,7 +37,7 @@ final class FilesystemResolver extends AbstractResolver implements PathedResolve
      * @param string|null $namespace
      * @return $this
      */
-    public function addTemplatePath($path, $namespace = null)
+    public function addPath($path, $namespace = null)
     {
         if (! is_dir($path)) {
             throw new Exception\InvalidPathException("Template path '$path' does not exist");
@@ -49,7 +49,7 @@ final class FilesystemResolver extends AbstractResolver implements PathedResolve
 
         $namespace = $namespace ?: self::DEFAULT_NAMESPACE;
         $path = rtrim((string) $path, '/\\');
-        $this->getTemplatePath($namespace)->push($path);
+        $this->getPath($namespace)->push($path);
 
         return $this;
     }
@@ -58,7 +58,7 @@ final class FilesystemResolver extends AbstractResolver implements PathedResolve
      * @param $namespace
      * @return SplStack
      */
-    private function getTemplatePath($namespace)
+    private function getPath($namespace)
     {
         if (!isset($this->paths[$namespace])) {
             $this->paths[$namespace] = new SplStack();
@@ -75,7 +75,7 @@ final class FilesystemResolver extends AbstractResolver implements PathedResolve
      */
     private function fetchResultForNamespace($template, $namespace)
     {
-        foreach ($this->getTemplatePath($namespace) as $path) {
+        foreach ($this->getPath($namespace) as $path) {
             if (! empty($path)) {
                 $path .= '/';
             }
@@ -83,7 +83,7 @@ final class FilesystemResolver extends AbstractResolver implements PathedResolve
             $contents = @file_get_contents($filename);
             if ($contents !== false) {
                 $key = $namespace . '::' . $template;
-                return new Result($key, $contents, $this->isCompiled());
+                return new Result($key, $contents, false, $this->isCompiled());
             }
         }
         return null;
