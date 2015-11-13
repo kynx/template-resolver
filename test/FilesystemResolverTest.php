@@ -28,7 +28,7 @@ final class FilesystemResolverTest extends TestCase
         $this->resolver->addPath(__DIR__ . '/templates');
         $result = $this->resolver->resolve('test');
         $this->assertEquals("test\n", (string) $result);
-        $this->assertEquals(__DIR__ . '/templates/test.template', $result->getKey());
+        $this->assertEquals('__DEFAULT__::test.template', $result->getKey());
         $this->assertFalse($result->isCompiled());
     }
 
@@ -77,7 +77,7 @@ final class FilesystemResolverTest extends TestCase
             ->addPath(__DIR__ . '/templates/test1', 'test');
         $result = $this->resolver->resolve('test::test');
         $this->assertEquals("test1 template\n", (string) $result);
-        $this->assertEquals(__DIR__ . '/templates/test1/test.template', $result->getKey());
+        $this->assertEquals('test::test.template', $result->getKey());
     }
 
     public function testNamespacedDefaultResolved()

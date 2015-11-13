@@ -11,6 +11,11 @@ Namespaced template resolver for templating systems that do not provide one.
 * Extensible: attach your own resolvers to handle loading templates from DB, etc.
 * No (non-dev) dependencies
 
+**Note:** PSR-6 is still in review. This means that the interface could change before it is finally published. This
+library will try to keep up to date with those changes.
+
+[![Build Status](https://travis-ci.org/kynx/template-resolver.svg?branch=master)](https://travis-ci.org/kynx/template-resolver)
+
 ## Installation
 
 Install via [Composer](http://getcomposer.com):
@@ -74,8 +79,9 @@ $resolver->accept($fileResolver, 0);
 $result = $resolver->resolve('mynamespace::test');
 if (! $result->isCached()) {
     // store the result in cache
-    $cacheItem = new RedisCacheItem($cachePool, $result->getKey());
+    $cacheItem = $cachePool->getItem($result->getKey());
     $cacheItem->set((string) $result);
+    $cachePool->save($cacheItem);
 }
 echo (string) $result;
 // outputs temple contents
@@ -102,8 +108,9 @@ if ($result->isCompiled()) {
 } else {
     // compile the result
     $compiled = $handlebars->precompile((string) $result);
-    $cacheItem = new RedisCacheItem($cachePool, $result->getKey());
+    $cacheItem = $cachePool->getItem($result->getKey());
     $cacheItem->set($compiled);
+    $cachePool->save($cacheItem);
 }
 // do something with your compiled template
 ```

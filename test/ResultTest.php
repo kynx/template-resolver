@@ -13,10 +13,11 @@ final class ResultTest extends TestCase
 {
     public function testConstruct()
     {
-        $result = new Result('foo::bar', 'my template string', true);
+        $result = new Result('foo::bar', 'my template string', true, true);
         $this->assertEquals('foo::bar', $result->getKey());
         $this->assertEquals('my template string', (string) $result);
         $this->assertEquals('my template string', $result->getContents());
         $this->assertEquals(true, $result->isCompiled());
+        $this->assertEquals(true, $result->isCached());
     }
 }
