@@ -41,4 +41,19 @@ interface CacheItemInterface
      *   True if the request resulted in a cache hit. False otherwise.
      */
     public function isHit();
+
+    /**
+     * Sets the value represented by this cache item.
+     *
+     * The $value argument may be any item that can be serialized by PHP,
+     * although the method of serialization is left up to the Implementing
+     * Library.
+     *
+     * @param mixed $value
+     *   The serializable value to be stored.
+     *
+     * @return static
+     *   The invoked object.
+     */
+    public function set($value);
 }

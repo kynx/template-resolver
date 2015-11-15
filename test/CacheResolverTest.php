@@ -44,17 +44,6 @@ final class CacheResolverTest extends TestCase
         $this->assertEquals($cacheKey, $result->getKey());
     }
 
-    public function testDefaultNamespaceWithAlternateSeparator()
-    {
-        $cacheKey = AbstractResolver::DEFAULT_NAMESPACE . '::test1.test';
-        $template = "test1 template";
-        $resolver = $this->getResolver($cacheKey, $template);
-        $resolver->setSeparator('.');
-        $result = $resolver->resolve('test1.test');
-        $this->assertEquals("test1 template", (string) $result);
-        $this->assertEquals($cacheKey, $result->getKey());
-    }
-
     public function testNamespacedTemplate()
     {
         $cacheKey = 'test::test';
@@ -94,6 +83,16 @@ final class CacheResolverTest extends TestCase
         $this->assertTrue($result->isCompiled());
     }
 
+    public function testSave()
+    {
+        $cacheKey = AbstractResolver::DEFAULT_NAMESPACE . '::test';
+        $template = "test";
+        $resolver = $this->getResolver($cacheKey, $template);
+        $resolver->save($cacheKey, $template);
+        $result = $resolver->resolve('test');
+        $this->assertEquals($template, $result->getContents());
+    }
+
     private function getResolver($cacheKey, $template, $isHit = true)
     {
         $itemProphesy = $this->prophesize(CacheItemInterface::class);
@@ -101,9 +100,13 @@ final class CacheResolverTest extends TestCase
             ->willReturn($isHit);
         $itemProphesy->get()
             ->willReturn($isHit ? $template : null);
+        $itemProphesy->set(Argument::any())
+            ->willReturn($itemProphesy->reveal());
         $cacheProphesy = $this->prophesize(CacheItemPoolInterface::class);
         $cacheProphesy->getItem($cacheKey)
             ->willReturn($itemProphesy->reveal());
+        $cacheProphesy->save(Argument::type(CacheItemInterface::class))
+            ->willReturn(true);
         return new CacheResolver($cacheProphesy->reveal());
     }
 }

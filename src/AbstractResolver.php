@@ -10,36 +10,7 @@ abstract class AbstractResolver implements ResolverInterface
 {
     const DEFAULT_NAMESPACE = '__DEFAULT__';
 
-    private $extension = 'template';
-
-    private $separator = '/';
-
     private $isCompiled = false;
-
-    protected $paths = [];
-
-
-    public function getExtension()
-    {
-        return $this->extension;
-    }
-
-    public function setExtension($extension)
-    {
-        $this->extension = $extension;
-        return $this;
-    }
-
-    public function getSeparator()
-    {
-        return $this->separator;
-    }
-
-    public function setSeparator($separator)
-    {
-        $this->separator = $separator;
-        return $this;
-    }
 
     public function isCompiled()
     {

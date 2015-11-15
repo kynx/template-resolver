@@ -14,6 +14,7 @@ use Kynx\Template\Resolver\CacheResolver;
 use Kynx\Template\Resolver\FilesystemResolver;
 use Kynx\Template\Resolver\Exception\InvalidNamespaceException;
 use PHPUnit_Framework_TestCase as TestCase;
+use Prophecy\Argument;
 
 final class AggregateResolverTest extends TestCase
 {
@@ -104,6 +105,78 @@ final class AggregateResolverTest extends TestCase
         $this->assertEquals("test\n", (string) $result);
     }
 
+    public function testAddPath()
+    {
+        $filesystem = $this->getFilesystemResolver();
+        $this->resolver->attach($filesystem, 0);
+        $this->resolver->addPath(__DIR__ . '/templates');
+        $result = $this->resolver->resolve('test');
+        $this->assertEquals("test\n", (string) $result);
+    }
+
+    /**
+     * @expectedException \Kynx\Template\Resolver\Exception\ResolverTypeNotFoundException
+     */
+    public function testAddPathNotSupported()
+    {
+        $cache = $this->getCacheResolver(AbstractResolver::DEFAULT_NAMESPACE . '::test', '', false);
+        $this->resolver->attach($cache);
+        $this->resolver->addPath(__DIR__ . '/templates');
+    }
+
+    public function testGetPaths()
+    {
+        $cache = $this->getCacheResolver(AbstractResolver::DEFAULT_NAMESPACE . '::test', '', false);
+        $filesystem = $this->getFilesystemResolver();
+        $path1 = __DIR__ . '/templates';
+        $path2 = __DIR__ . '/templates/test1';
+        $filesystem->addPath($path1)
+            ->addPath($path2, 'test');
+        $this->resolver->attach($filesystem, 0);
+        $this->resolver->attach($cache);
+        $paths = $this->resolver->getPaths();
+        $this->assertEquals(2, count($paths));
+        $this->assertEquals(new \SplStack($path1), $paths['__DEFAULT__']);
+        $this->assertEquals(new \SplStack($path2), $paths['test']);
+    }
+
+    /**
+     * @expectedException \Kynx\Template\Resolver\Exception\ResolverTypeNotFoundException
+     */
+    public function testGetPathsNotSupported()
+    {
+        $cache = $this->getCacheResolver(AbstractResolver::DEFAULT_NAMESPACE . '::test', '', false);
+        $this->resolver->attach($cache);
+        $this->resolver->getPaths();
+    }
+
+    public function testSave()
+    {
+        $cache = $this->getCacheResolver(AbstractResolver::DEFAULT_NAMESPACE . '::test', 'foo', true);
+        $this->resolver->attach($cache);
+        $this->resolver->save('test', 'foo');
+        $result = $this->resolver->resolve('test');
+        $this->assertEquals('foo', (string) $result);
+    }
+
+    /**
+     * @expectedException \Kynx\Template\Resolver\Exception\ResolverTypeNotFoundException
+     */
+    public function testSaveNotSupported()
+    {
+        $filesystem = $this->getFilesystemResolver();
+        $this->resolver->attach($filesystem);
+        $this->resolver->save('test', 'foo');
+    }
+
+    /**
+     * @expectedException \Kynx\Template\Resolver\Exception\BadMethodCallException
+     */
+    public function testSetIsCompiled()
+    {
+        $this->resolver->setIsCompiled(true);
+    }
+
     private function getFilesystemResolver()
     {
         return new FilesystemResolver();
@@ -116,9 +189,13 @@ final class AggregateResolverTest extends TestCase
             ->willReturn($isHit);
         $itemProphesy->get()
             ->willReturn($isHit ? $template : null);
+        $itemProphesy->set(Argument::any())
+            ->willReturn($itemProphesy->reveal());
         $cacheProphesy = $this->prophesize(CacheItemPoolInterface::class);
         $cacheProphesy->getItem($cacheKey)
             ->willReturn($itemProphesy->reveal());
+        $cacheProphesy->save(Argument::type(CacheItemInterface::class))
+            ->willReturn(true);
         return new CacheResolver($cacheProphesy->reveal());
     }
 }

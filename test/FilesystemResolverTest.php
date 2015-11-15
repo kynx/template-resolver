@@ -111,4 +111,16 @@ final class FilesystemResolverTest extends TestCase
         $result = $this->resolver->resolve('test');
         $this->assertTrue($result->isCompiled());
     }
+
+    public function testGetPaths()
+    {
+        $path1 = __DIR__ . '/templates';
+        $path2 = __DIR__ . '/templates/test1';
+        $this->resolver->addPath($path1)
+            ->addPath($path2, 'test');
+        $paths = $this->resolver->getPaths();
+        $this->assertEquals(2, count($paths));
+        $this->assertEquals(new \SplStack($path1), $paths['__DEFAULT__']);
+        $this->assertEquals(new \SplStack($path2), $paths['test']);
+    }
 }

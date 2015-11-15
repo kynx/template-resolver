@@ -10,6 +10,34 @@ use SplStack;
 
 final class FilesystemResolver extends AbstractResolver implements PathedResolverInterface
 {
+    private $extension = 'template';
+
+    private $separator = '/';
+
+    protected $paths = [];
+
+    public function getExtension()
+    {
+        return $this->extension;
+    }
+
+    public function setExtension($extension)
+    {
+        $this->extension = $extension;
+        return $this;
+    }
+
+    public function getSeparator()
+    {
+        return $this->separator;
+    }
+
+    public function setSeparator($separator)
+    {
+        $this->separator = $separator;
+        return $this;
+    }
+
     /**
      * @param $template
      * @return Result|null
@@ -87,5 +115,10 @@ final class FilesystemResolver extends AbstractResolver implements PathedResolve
             }
         }
         return null;
+    }
+
+    public function getPaths()
+    {
+        return $this->paths;
     }
 }

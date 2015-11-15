@@ -15,4 +15,10 @@ interface PathedResolverInterface extends ResolverInterface
      * @return $this
      */
     public function addPath($path, $namespace = null);
+
+    /**
+     * Returns multi-dimensional array of namespace => paths for resolver
+     * @return array
+     */
+    public function getPaths();
 }

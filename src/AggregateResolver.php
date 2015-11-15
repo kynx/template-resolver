@@ -10,9 +10,10 @@ namespace Kynx\Template\Resolver;
 
 use Countable;
 use IteratorAggregate;
+use Kynx\Template\Resolver\Exception\ResolverTypeNotFoundException;
 use SplPriorityQueue;
 
-class AggregateResolver implements Countable, IteratorAggregate, ResolverInterface
+class AggregateResolver implements Countable, IteratorAggregate, PathedResolverInterface, SavingResolverInterface
 {
     /**
      * @var SplPriorityQueue
@@ -30,7 +31,7 @@ class AggregateResolver implements Countable, IteratorAggregate, ResolverInterfa
     }
 
     /**
-     * Resolve a template name to a resource the renderer can consume.
+     * Returns result from first resolver that matches
      *
      * @param  string $template
      * @return Result|null
@@ -44,6 +45,18 @@ class AggregateResolver implements Countable, IteratorAggregate, ResolverInterfa
             }
         }
         return null;
+    }
+
+    public function save($template, $contents)
+    {
+        foreach ($this->queue as $resolver) {
+            if ($resolver instanceof SavingResolverInterface) {
+                return $resolver->save($template, $contents);
+            }
+        }
+        throw new Exception\ResolverTypeNotFoundException(
+            sprintf("No resolvers implement %s", SavingResolverInterface::class)
+        );
     }
 
     /**
@@ -77,6 +90,31 @@ class AggregateResolver implements Countable, IteratorAggregate, ResolverInterfa
     {
         $this->queue->insert($resolver, $priority);
         return $this;
+    }
+
+    public function addPath($path, $namespace = null)
+    {
+        foreach ($this as $resolver) {
+            if ($resolver instanceof PathedResolverInterface) {
+                $resolver->addPath($path, $namespace);
+                return true;
+            }
+        }
+        throw new ResolverTypeNotFoundException(
+            sprintf("No resolvers implement %s", PathedResolverInterface::class)
+        );
+    }
+
+    public function getPaths()
+    {
+        foreach ($this as $resolver) {
+            if ($resolver instanceof PathedResolverInterface) {
+                return $resolver->getPaths();
+            }
+        }
+        throw new ResolverTypeNotFoundException(
+            sprintf("No resolvers implement %s", PathedResolverInterface::class)
+        );
     }
 
     /**
@@ -118,5 +156,10 @@ class AggregateResolver implements Countable, IteratorAggregate, ResolverInterfa
             return $resolvers->queue->extract();
         }
         return $resolvers;
+    }
+
+    public function setIsCompiled($isCompiled)
+    {
+        throw new Exception\BadMethodCallException("Aggregate resolvers cannot be marked as compiled");
     }
 }

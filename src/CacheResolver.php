@@ -8,7 +8,7 @@ namespace Kynx\Template\Resolver;
 
 use Kynx\Template\Resolver\Cache\CacheItemPoolInterface;
 
-final class CacheResolver extends AbstractResolver
+final class CacheResolver extends AbstractResolver implements SavingResolverInterface
 {
     /**
      * @var CacheItemPoolInterface
@@ -27,7 +27,7 @@ final class CacheResolver extends AbstractResolver
      * @param $template
      * @return Result|null
      */
-    public function resolve($template)
+    public function resolve($template, callable $next = null)
     {
         $resolvedTemplate = $this->parseTemplateNamespace($template);
         $namespace = $resolvedTemplate['namespace'];
@@ -39,7 +39,15 @@ final class CacheResolver extends AbstractResolver
         }
 
         return $this->fetchResultForNamespace($template, self::DEFAULT_NAMESPACE);
+    }
 
+    public function save($name, $contents)
+    {
+        $resolvedTemplate = $this->parseTemplateNamespace($name);
+        $key = $resolvedTemplate['namespace'] . '::' . $resolvedTemplate['template'];
+        $cacheItem = $this->cacheItemPool->getItem($key);
+        $cacheItem->set($contents);
+        return $this->cacheItemPool->save($cacheItem);
     }
 
     /**
@@ -49,7 +57,7 @@ final class CacheResolver extends AbstractResolver
      * @param $namespace
      * @return Result|null
      */
-    public function fetchResultForNamespace($template, $namespace)
+    private function fetchResultForNamespace($template, $namespace)
     {
         $key = $namespace . '::' . $template;
         $cacheItem = $this->cacheItemPool->getItem($key);

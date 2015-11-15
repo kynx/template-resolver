@@ -2,6 +2,8 @@
 
 Namespaced template resolver for templating systems that do not provide one.
 
+[![Build Status](https://travis-ci.org/kynx/template-resolver.svg?branch=master)](https://travis-ci.org/kynx/template-resolver)
+
 ## Features
 
 * Filesystem resolver can be configured to search multiple paths for templates
@@ -14,7 +16,6 @@ Namespaced template resolver for templating systems that do not provide one.
 **Note:** PSR-6 is still in review. This means that the interface could change before it is finally published. This
 library will try to keep up to date with those changes.
 
-[![Build Status](https://travis-ci.org/kynx/template-resolver.svg?branch=master)](https://travis-ci.org/kynx/template-resolver)
 
 ## Installation
 
@@ -58,11 +59,10 @@ not found there the default namespace will be searched.
 ## Caching templates
 
 To speed up subsequent lookups for templates you can store them in any [PSR-6](https://github.com/php-fig/fig-standards/blob/master/proposed/cache.md)
-compliant caching engine. The example below uses [bravo3/cache](https://github.com/bravo3/cache). The `AggregateResolver` enables you to search the cache for templates first before hitting the
-filesystem:
+compliant caching engine. The example below uses [bravo3/cache](https://github.com/bravo3/cache). The 
+`AggregateResolver` enables you to search the cache for templates first before hitting the filesystem:
 
 ```php
-
 $resolver = new AggregateResolver();
 
 $cachePool = new RedisCachePool('tcp://10.0.0.1:6379');
@@ -79,9 +79,7 @@ $resolver->accept($fileResolver, 0);
 $result = $resolver->resolve('mynamespace::test');
 if (! $result->isCached()) {
     // store the result in cache
-    $cacheItem = $cachePool->getItem($result->getKey());
-    $cacheItem->set((string) $result);
-    $cachePool->save($cacheItem);
+    $resolver->save($result->getKey(), (string) $result);
 }
 echo (string) $result;
 // outputs temple contents
@@ -97,7 +95,7 @@ Many template systems can compile templates to speed up subsequent processing. T
 tokens, a PHP function or, as in my own [Handlebars implementation](https://github.com/kynx/v8js-handlebars), javascript.
 All of these make an excellent candidate for caching. Extending the above example:
 
-```
+```php
 // ...
 $cacheResolver = new CacheResolver($cachePool);
 $cachResolver->setIsCompiled(true);
@@ -108,12 +106,12 @@ if ($result->isCompiled()) {
 } else {
     // compile the result
     $compiled = $handlebars->precompile((string) $result);
-    $cacheItem = $cachePool->getItem($result->getKey());
-    $cacheItem->set($compiled);
-    $cachePool->save($cacheItem);
+    $resolver->save($result->getKey(), $compiled);
 }
 // do something with your compiled template
 ```
+
+The `AggregateResolver` will save the result in the first resolver in it's queue that supports the `save()` method.
 
 ## `Result` objects
 
@@ -131,10 +129,12 @@ convenience method for accessing the content. Other methods of interest are:
 ## Extending
 
 To create other resolvers - for instance, to fetch templates from a DB - implement the `ResolverInterface`. This contains
-only one method, `resolve()`, which should return a `Result` object.
+only two methods, `resolve()` and `setIsCompiled()`.
 
 If your resolver can handle multiple paths it should implement the `PathedResolverInterface`, which augments the above
-with an `addPath()` method.
+with an `addPath()` and `getPaths()` method.
+
+If your resolver supports saving results back, implement the `SavingResolverInterface`.
 
 For convenience there is an `AbstractResolver` class you can extend, which contains some useful utility methods.
 
