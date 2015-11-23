@@ -38,7 +38,7 @@ class AggregateResolver implements Countable, IteratorAggregate, PathedResolverI
      */
     public function resolve($template)
     {
-        foreach ($this->queue as $resolver) {
+        foreach ($this as $resolver) {
             $resource = $resolver->resolve($template);
             if (! is_null($resource)) {
                 return $resource;
@@ -49,7 +49,7 @@ class AggregateResolver implements Countable, IteratorAggregate, PathedResolverI
 
     public function save($template, $contents)
     {
-        foreach ($this->queue as $resolver) {
+        foreach ($this as $resolver) {
             if ($resolver instanceof SavingResolverInterface) {
                 return $resolver->save($template, $contents);
             }
@@ -76,7 +76,8 @@ class AggregateResolver implements Countable, IteratorAggregate, PathedResolverI
      */
     public function getIterator()
     {
-        return $this->queue;
+        // return clone so iterating doesn't trash heap
+        return clone $this->queue;
     }
 
     /**

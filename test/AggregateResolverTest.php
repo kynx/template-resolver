@@ -72,6 +72,17 @@ final class AggregateResolverTest extends TestCase
         $this->assertEquals($resolver, $iterator->top());
     }
 
+    public function testIteratorIsClone()
+    {
+        $resolver = $this->getFilesystemResolver();
+        $this->resolver->attach($resolver);
+        $this->assertEquals(1, count($this->resolver));
+        foreach ($this->resolver as $resolver) {
+            $this->assertInstanceOf(FilesystemResolver::class, $resolver);
+        }
+        $this->assertEquals(1, count($this->resolver));
+    }
+
     public function testUnresolvedReturnsNull()
     {
         $cache = $this->getCacheResolver(AbstractResolver::DEFAULT_NAMESPACE . '::missing', '', false);
