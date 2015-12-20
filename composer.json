@@ -11,12 +11,12 @@
     ],
     "autoload" : {
         "psr-4" : {
-            "\\Kynx\\Template\\Resolver\\" : "src/"
+            "Kynx\\Template\\Resolver\\" : "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "\\KynxTest\\Template\\Resolver\\": "test/"
+            "KynxTest\\Template\\Resolver\\": "test/"
         }
     },
     "require" : {
