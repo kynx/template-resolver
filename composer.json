@@ -1,29 +1,33 @@
 {
-  "name": "kynx/template-resolver",
-  "description": "Namespaced template resolver for templating packages that do not provide one",
-  "prefer-stable" : true,
-  "license": "MIT",
-  "authors": [
-    {
-      "name": "Matt Kynaston",
-      "email": "matt@kynx.org"
+    "name": "kynx/template-resolver",
+    "description": "Namespaced template resolver for templating packages that do not provide one",
+    "prefer-stable" : true,
+    "license": "MIT",
+    "authors": [
+      {
+        "name": "Matt Kynaston",
+        "email": "matt@kynx.org"
+      }
+    ],
+    "autoload" : {
+        "psr-4" : {
+            "\\Kynx\\Template\\Resolver\\" : "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "\\KynxTest\\Template\\Resolver\\": "test/"
+        }
+    },
+    "require" : {
+        "php": ">=5.5",
+        "psr/cache": "^1.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^4.8",
+        "squizlabs/php_codesniffer": "^2.3"
+    },
+    "suggest" : {
+        "kynx/zend-cache-psr6" : "PSR-6 wrapper for Zend Cache"
     }
-  ],
-  "autoload" : {
-    "psr-4" : {
-      "Kynx\\Template\\Resolver\\" : "src/"
-    }
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "KynxTest\\Template\\Resolver\\": "test/"
-    }
-  },
-  "require" : {
-    "php": ">=5.5"
-  },
-  "require-dev": {
-    "phpunit/phpunit": "^4.8",
-    "squizlabs/php_codesniffer": "^2.3"
-  }
 }

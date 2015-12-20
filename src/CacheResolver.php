@@ -6,7 +6,7 @@
 
 namespace Kynx\Template\Resolver;
 
-use Kynx\Template\Resolver\Cache\CacheItemPoolInterface;
+use Psr\Cache\CacheItemPoolInterface;
 
 final class CacheResolver extends AbstractResolver implements SavingResolverInterface
 {
@@ -18,7 +18,7 @@ final class CacheResolver extends AbstractResolver implements SavingResolverInte
     /**
      * @param CacheItemPoolInterface $cacheItemPool
      */
-    public function __construct($cacheItemPool)
+    public function __construct(CacheItemPoolInterface $cacheItemPool)
     {
         $this->cacheItemPool = $cacheItemPool;
     }

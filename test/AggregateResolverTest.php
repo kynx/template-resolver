@@ -8,13 +8,12 @@ namespace KynxTest\Template\Resolver;
 
 use Kynx\Template\Resolver\AbstractResolver;
 use Kynx\Template\Resolver\AggregateResolver;
-use Kynx\Template\Resolver\Cache\CacheItemInterface;
-use Kynx\Template\Resolver\Cache\CacheItemPoolInterface;
 use Kynx\Template\Resolver\CacheResolver;
 use Kynx\Template\Resolver\FilesystemResolver;
-use Kynx\Template\Resolver\Exception\InvalidNamespaceException;
 use PHPUnit_Framework_TestCase as TestCase;
 use Prophecy\Argument;
+use Psr\Cache\CacheItemInterface;
+use Psr\Cache\CacheItemPoolInterface;
 
 final class AggregateResolverTest extends TestCase
 {

@@ -8,10 +8,10 @@ namespace KynxTest\Template\Resolver;
 
 use Kynx\Template\Resolver\AbstractResolver;
 use Kynx\Template\Resolver\CacheResolver;
-use Kynx\Template\Resolver\Cache\CacheItemPoolInterface;
-use Kynx\Template\Resolver\Cache\CacheItemInterface;
 use PHPUnit_Framework_TestCase as TestCase;
 use Prophecy\Argument;
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\Cache\CacheItemInterface;
 
 final class CacheResolverTest extends TestCase
 {
