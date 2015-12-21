@@ -7,14 +7,12 @@ Namespaced template resolver for templating systems that do not provide one.
 ## Features
 
 * Filesystem resolver can be configured to search multiple paths for templates
-* Cache resolver uses any [PSR-6](https://github.com/php-fig/fig-standards/blob/master/proposed/cache.md)
+* Cache resolver uses any [PSR-6](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-6-cache.md)
   compliant caching library
 * Aggregate resolver will search attached resolvers by priority, returning first match
 * Extensible: attach your own resolvers to handle loading templates from DB, etc.
-* No (non-dev) dependencies
+* No (non-dev) dependencies except for PSR-6
 
-**Note:** PSR-6 is still in review. This means that the interface could change before it is finally published. This
-library will try to keep up to date with those changes.
 
 
 ## Installation
@@ -58,7 +56,7 @@ not found there the default namespace will be searched.
 
 ## Caching templates
 
-To speed up subsequent lookups for templates you can store them in any [PSR-6](https://github.com/php-fig/fig-standards/blob/master/proposed/cache.md)
+To speed up subsequent lookups for templates you can store them in any [PSR-6](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-6-cache.md)
 compliant caching engine. The example below uses [bravo3/cache](https://github.com/bravo3/cache). The 
 `AggregateResolver` enables you to search the cache for templates first before hitting the filesystem:
 
